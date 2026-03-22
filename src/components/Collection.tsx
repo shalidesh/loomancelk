@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { motion, useAnimationFrame, useMotionValue, useTransform, wrap, AnimatePresence } from "framer-motion";
+import { motion, useAnimationFrame, useMotionValue, useTransform, wrap, AnimatePresence, MotionValue } from "framer-motion";
 import Image from "next/image";
 
 const baseItems = [
@@ -20,6 +20,9 @@ const baseItems = [
 
 const items = [...baseItems, ...baseItems];
 
+type CollectionItem = typeof baseItems[0];
+type Metrics = { itemWidth: number; trackWidth: number; containerWidth: number; };
+
 function ParallaxCard({ 
   item, 
   index, 
@@ -27,11 +30,11 @@ function ParallaxCard({
   metrics,
   onClick
 }: { 
-  item: typeof items[0], 
+  item: CollectionItem, 
   index: number, 
-  wrappedX: any, 
-  metrics: any,
-  onClick: (index: number, item: any) => void
+  wrappedX: MotionValue<number>, 
+  metrics: Metrics,
+  onClick: (index: number, item: CollectionItem) => void
 }) {
   const parallaxX = useTransform(wrappedX, (currentX: number) => {
     if (metrics.itemWidth === 0) return "0%";
@@ -92,7 +95,7 @@ export default function Collection() {
   const trackRef = useRef<HTMLDivElement>(null);
   
   const [metrics, setMetrics] = useState({ itemWidth: 0, trackWidth: 0, containerWidth: 0 });
-  const [selectedImage, setSelectedImage] = useState<{item: any, index: number} | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{item: CollectionItem, index: number} | null>(null);
 
   const targetX = useRef(0);
   const currentX = useRef(0);
@@ -168,7 +171,7 @@ export default function Collection() {
     }
   };
 
-  const handleCardClick = (index: number, item: any) => {
+  const handleCardClick = (index: number, item: CollectionItem) => {
     if (dragDistance.current > 10) return; // Prevent zooming if the user was actively dragging
     setSelectedImage({ index, item });
   };
